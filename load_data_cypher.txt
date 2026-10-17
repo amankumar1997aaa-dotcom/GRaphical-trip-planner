@@ -1,0 +1,187 @@
+MATCH (n) DETACH DELETE n;
+
+UNWIND [
+  {name:'Bengaluru', state:'Karnataka'},
+  {name:'Mysuru', state:'Karnataka'},
+  {name:'Coorg', state:'Karnataka'},
+  {name:'Chikmagalur', state:'Karnataka'},
+  {name:'Hampi', state:'Karnataka'},
+  {name:'Gokarna', state:'Karnataka'},
+  {name:'Udupi', state:'Karnataka'},
+  {name:'Mangaluru', state:'Karnataka'},
+  {name:'Goa', state:'Goa'},
+  {name:'Kochi', state:'Kerala'},
+  {name:'Munnar', state:'Kerala'},
+  {name:'Wayanad', state:'Kerala'},
+  {name:'Ooty', state:'Tamil Nadu'},
+  {name:'Pondicherry', state:'Puducherry'},
+  {name:'Chennai', state:'Tamil Nadu'}
+] AS c
+MERGE (:City {name:c.name, state:c.state});
+
+UNWIND [
+  {src:'Bengaluru', dst:'Mysuru', mode:'train', hours:3, cost:300},
+  {src:'Bengaluru', dst:'Coorg', mode:'bus', hours:6, cost:700},
+  {src:'Bengaluru', dst:'Chikmagalur', mode:'bus', hours:5, cost:600},
+  {src:'Bengaluru', dst:'Hampi', mode:'bus', hours:7, cost:900},
+  {src:'Bengaluru', dst:'Gokarna', mode:'bus', hours:10, cost:1100},
+  {src:'Bengaluru', dst:'Goa', mode:'bus', hours:12, cost:1400},
+  {src:'Bengaluru', dst:'Udupi', mode:'bus', hours:8.5, cost:900},
+  {src:'Bengaluru', dst:'Pondicherry', mode:'bus', hours:6, cost:700},
+  {src:'Bengaluru', dst:'Chennai', mode:'train', hours:5, cost:600},
+  {src:'Bengaluru', dst:'Ooty', mode:'bus', hours:7, cost:800},
+  {src:'Bengaluru', dst:'Wayanad', mode:'bus', hours:6.5, cost:800},
+  {src:'Bengaluru', dst:'Kochi', mode:'bus', hours:11, cost:1200},
+  {src:'Mysuru', dst:'Coorg', mode:'bus', hours:3, cost:300},
+  {src:'Mysuru', dst:'Ooty', mode:'bus', hours:4, cost:400},
+  {src:'Mysuru', dst:'Wayanad', mode:'bus', hours:3.5, cost:400},
+  {src:'Coorg', dst:'Wayanad', mode:'bus', hours:4, cost:400},
+  {src:'Coorg', dst:'Mangaluru', mode:'bus', hours:4, cost:400},
+  {src:'Hampi', dst:'Gokarna', mode:'bus', hours:8, cost:700},
+  {src:'Hampi', dst:'Goa', mode:'bus', hours:8, cost:800},
+  {src:'Gokarna', dst:'Goa', mode:'bus', hours:4, cost:400},
+  {src:'Gokarna', dst:'Udupi', mode:'bus', hours:3.5, cost:300},
+  {src:'Udupi', dst:'Mangaluru', mode:'bus', hours:1.5, cost:150},
+  {src:'Chikmagalur', dst:'Udupi', mode:'bus', hours:3.5, cost:300},
+  {src:'Chikmagalur', dst:'Mangaluru', mode:'bus', hours:4, cost:350},
+  {src:'Mangaluru', dst:'Kochi', mode:'train', hours:9, cost:600},
+  {src:'Kochi', dst:'Munnar', mode:'bus', hours:4, cost:300},
+  {src:'Ooty', dst:'Kochi', mode:'bus', hours:8, cost:700},
+  {src:'Pondicherry', dst:'Chennai', mode:'bus', hours:3.5, cost:300}
+] AS r
+MATCH (a:City {name:r.src}), (b:City {name:r.dst})
+MERGE (a)-[:CONNECTED_BY {mode:r.mode, hours:r.hours, cost:r.cost}]->(b)
+MERGE (b)-[:CONNECTED_BY {mode:r.mode, hours:r.hours, cost:r.cost}]->(a);
+
+UNWIND [
+  {name:'Lalbagh Garden', city:'Bengaluru', cost:30, tags:['nature']},
+  {name:'Craft Brewery Night', city:'Bengaluru', cost:800, tags:['nightlife','food']},
+  {name:'Mysore Palace', city:'Mysuru', cost:100, tags:['heritage']},
+  {name:'Chamundi Hills', city:'Mysuru', cost:0, tags:['temple','nature']},
+  {name:'Abbey Falls', city:'Coorg', cost:50, tags:['nature','trek']},
+  {name:'Dubare Elephant Camp', city:'Coorg', cost:300, tags:['nature']},
+  {name:'Rajas Seat Sunset', city:'Coorg', cost:20, tags:['nature']},
+  {name:'Mullayanagiri Trek', city:'Chikmagalur', cost:0, tags:['trek','nature']},
+  {name:'Coffee Estate Tour', city:'Chikmagalur', cost:300, tags:['food','nature']},
+  {name:'Virupaksha Temple', city:'Hampi', cost:0, tags:['temple','heritage']},
+  {name:'Vittala Temple', city:'Hampi', cost:40, tags:['heritage','temple']},
+  {name:'Matanga Hill Sunrise', city:'Hampi', cost:0, tags:['trek','nature']},
+  {name:'Om Beach', city:'Gokarna', cost:0, tags:['beach','nature']},
+  {name:'Kudle Beach', city:'Gokarna', cost:0, tags:['beach','food']},
+  {name:'Beach Trek Kudle to Paradise', city:'Gokarna', cost:0, tags:['trek','beach']},
+  {name:'Mahabaleshwar Temple', city:'Gokarna', cost:0, tags:['temple']},
+  {name:'Baga Beach', city:'Goa', cost:0, tags:['beach','nightlife']},
+  {name:'Basilica of Bom Jesus', city:'Goa', cost:0, tags:['heritage']},
+  {name:'Dudhsagar Falls', city:'Goa', cost:500, tags:['nature','trek']},
+  {name:'Udupi Krishna Temple', city:'Udupi', cost:0, tags:['temple','food']},
+  {name:'Malpe Beach', city:'Udupi', cost:50, tags:['beach','food']},
+  {name:'St Marys Island', city:'Udupi', cost:300, tags:['beach','nature']},
+  {name:'Panambur Beach', city:'Mangaluru', cost:0, tags:['beach']},
+  {name:'Kadri Manjunath Temple', city:'Mangaluru', cost:0, tags:['temple']},
+  {name:'Fort Kochi Fishing Nets', city:'Kochi', cost:0, tags:['heritage','food']},
+  {name:'Kathakali Show', city:'Kochi', cost:400, tags:['heritage']},
+  {name:'Munnar Tea Gardens', city:'Munnar', cost:100, tags:['nature']},
+  {name:'Eravikulam National Park', city:'Munnar', cost:200, tags:['nature','trek']},
+  {name:'Edakkal Caves', city:'Wayanad', cost:50, tags:['trek','heritage']},
+  {name:'Chembra Peak Trek', city:'Wayanad', cost:200, tags:['trek','nature']},
+  {name:'Ooty Botanical Garden', city:'Ooty', cost:50, tags:['nature']},
+  {name:'Nilgiri Mountain Railway', city:'Ooty', cost:300, tags:['heritage','nature']},
+  {name:'Promenade Beach', city:'Pondicherry', cost:0, tags:['beach','food']},
+  {name:'Auroville', city:'Pondicherry', cost:0, tags:['nature']},
+  {name:'French Quarter Cafes', city:'Pondicherry', cost:500, tags:['food','heritage']},
+  {name:'Marina Beach', city:'Chennai', cost:0, tags:['beach','food']},
+  {name:'Kapaleeshwarar Temple', city:'Chennai', cost:0, tags:['temple','heritage']}
+] AS p
+MATCH (c:City {name:p.city})
+MERGE (a:Attraction {name:p.name})
+SET a.cost = p.cost
+MERGE (a)-[:LOCATED_IN]->(c)
+WITH a, p
+UNWIND p.tags AS tag
+MERGE (t:Tag {name:tag})
+MERGE (a)-[:HAS_TAG]->(t);
+
+// ===== 13 NEW CITIES =====
+UNWIND [
+  {name:'Hyderabad', state:'Telangana'},
+  {name:'Madurai', state:'Tamil Nadu'},
+  {name:'Rameswaram', state:'Tamil Nadu'},
+  {name:'Kanyakumari', state:'Tamil Nadu'},
+  {name:'Thekkady', state:'Kerala'},
+  {name:'Alleppey', state:'Kerala'},
+  {name:'Varkala', state:'Kerala'},
+  {name:'Kodaikanal', state:'Tamil Nadu'},
+  {name:'Tirupati', state:'Andhra Pradesh'},
+  {name:'Mahabalipuram', state:'Tamil Nadu'},
+  {name:'Coimbatore', state:'Tamil Nadu'},
+  {name:'Thanjavur', state:'Tamil Nadu'},
+  {name:'Badami', state:'Karnataka'}
+] AS c
+MERGE (:City {name:c.name, state:c.state});
+
+// ===== NEW CONNECTIONS =====
+UNWIND [
+  {src:'Bengaluru', dst:'Hyderabad', mode:'bus', hours:10, cost:1000},
+  {src:'Bengaluru', dst:'Madurai', mode:'bus', hours:9, cost:900},
+  {src:'Bengaluru', dst:'Kodaikanal', mode:'bus', hours:8, cost:900},
+  {src:'Bengaluru', dst:'Tirupati', mode:'bus', hours:5, cost:500},
+  {src:'Bengaluru', dst:'Coimbatore', mode:'bus', hours:6, cost:700},
+  {src:'Chennai', dst:'Mahabalipuram', mode:'bus', hours:2, cost:150},
+  {src:'Pondicherry', dst:'Mahabalipuram', mode:'bus', hours:2.5, cost:200},
+  {src:'Chennai', dst:'Tirupati', mode:'bus', hours:3.5, cost:300},
+  {src:'Chennai', dst:'Thanjavur', mode:'bus', hours:7, cost:500},
+  {src:'Madurai', dst:'Rameswaram', mode:'bus', hours:4, cost:300},
+  {src:'Madurai', dst:'Kanyakumari', mode:'bus', hours:5, cost:400},
+  {src:'Madurai', dst:'Kodaikanal', mode:'bus', hours:3.5, cost:250},
+  {src:'Madurai', dst:'Thanjavur', mode:'bus', hours:3.5, cost:250},
+  {src:'Coimbatore', dst:'Ooty', mode:'bus', hours:3.5, cost:250},
+  {src:'Munnar', dst:'Thekkady', mode:'bus', hours:4, cost:300},
+  {src:'Kochi', dst:'Alleppey', mode:'bus', hours:1.5, cost:150},
+  {src:'Alleppey', dst:'Varkala', mode:'bus', hours:3.5, cost:250},
+  {src:'Hampi', dst:'Badami', mode:'bus', hours:4, cost:400},
+  {src:'Bengaluru', dst:'Badami', mode:'bus', hours:10, cost:1000}
+] AS r
+MATCH (a:City {name:r.src}), (b:City {name:r.dst})
+MERGE (a)-[:CONNECTED_BY {mode:r.mode, hours:r.hours, cost:r.cost}]->(b)
+MERGE (b)-[:CONNECTED_BY {mode:r.mode, hours:r.hours, cost:r.cost}]->(a);
+
+// ===== NEW ATTRACTIONS (26) =====
+UNWIND [
+  {name:'Charminar', city:'Hyderabad', cost:25, tags:['heritage']},
+  {name:'Golconda Fort', city:'Hyderabad', cost:25, tags:['heritage']},
+  {name:'Meenakshi Amman Temple', city:'Madurai', cost:0, tags:['temple']},
+  {name:'Thirumalai Nayakkar Mahal', city:'Madurai', cost:50, tags:['heritage']},
+  {name:'Pamban Bridge', city:'Rameswaram', cost:0, tags:['heritage']},
+  {name:'Ramanathaswamy Temple', city:'Rameswaram', cost:0, tags:['temple']},
+  {name:'Vivekananda Rock Memorial', city:'Kanyakumari', cost:75, tags:['heritage']},
+  {name:'Kanyakumari Sunrise Point', city:'Kanyakumari', cost:0, tags:['beach']},
+  {name:'Periyar Boat Safari', city:'Thekkady', cost:400, tags:['nature']},
+  {name:'Spice Plantation Tour', city:'Thekkady', cost:300, tags:['food']},
+  {name:'Alleppey Shikara Ride', city:'Alleppey', cost:600, tags:['nature']},
+  {name:'Alleppey Beach', city:'Alleppey', cost:0, tags:['beach']},
+  {name:'Varkala Cliff', city:'Varkala', cost:0, tags:['beach']},
+  {name:'Janardhana Swamy Temple', city:'Varkala', cost:0, tags:['temple']},
+  {name:'Coakers Walk', city:'Kodaikanal', cost:30, tags:['nature']},
+  {name:'Pillar Rocks', city:'Kodaikanal', cost:20, tags:['trek']},
+  {name:'Tirumala Venkateswara Temple', city:'Tirupati', cost:0, tags:['temple']},
+  {name:'Kapila Theertham', city:'Tirupati', cost:0, tags:['temple']},
+  {name:'Shore Temple', city:'Mahabalipuram', cost:40, tags:['heritage']},
+  {name:'Five Rathas', city:'Mahabalipuram', cost:40, tags:['heritage']},
+  {name:'Marudamalai Temple', city:'Coimbatore', cost:0, tags:['temple']},
+  {name:'Adiyogi Shiva Statue', city:'Coimbatore', cost:0, tags:['temple']},
+  {name:'Brihadeeswarar Temple', city:'Thanjavur', cost:0, tags:['temple']},
+  {name:'Thanjavur Maratha Palace', city:'Thanjavur', cost:50, tags:['heritage']},
+  {name:'Badami Cave Temples', city:'Badami', cost:40, tags:['heritage']},
+  {name:'Banashankari Temple', city:'Badami', cost:0, tags:['temple']}
+] AS p
+MATCH (c:City {name:p.city})
+MERGE (a:Attraction {name:p.name})
+SET a.cost = p.cost
+MERGE (a)-[:LOCATED_IN]->(c)
+WITH a, p
+UNWIND p.tags AS tag
+MERGE (t:Tag {name:tag})
+MERGE (a)-[:HAS_TAG]->(t);
+
+MATCH (c:City)<-[:LOCATED_IN]-(a:Attraction)-[:HAS_TAG]->(t:Tag)
+RETURN c, a, t LIMIT 300;
